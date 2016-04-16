@@ -12,9 +12,9 @@
 		A7861A131CC1C35400A6AFBB /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A7861A111CC1C35400A6AFBB /* Main.storyboard */; };
 		A7861A151CC1C35400A6AFBB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A7861A141CC1C35400A6AFBB /* Assets.xcassets */; };
 		A7861A181CC1C35400A6AFBB /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A7861A161CC1C35400A6AFBB /* LaunchScreen.storyboard */; };
-		A7861A221CC1C3D400A6AFBB /* MLOfflineManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7861A211CC1C3D400A6AFBB /* MLOfflineManager.swift */; };
+		A7861A221CC1C3D400A6AFBB /* OfflineManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7861A211CC1C3D400A6AFBB /* OfflineManager.swift */; };
 		A7861A261CC1D58700A6AFBB /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7861A251CC1D58700A6AFBB /* Reachability.swift */; };
-		A7861A281CC1E82300A6AFBB /* MLOfflineOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7861A271CC1E82300A6AFBB /* MLOfflineOperation.swift */; };
+		A7861A281CC1E82300A6AFBB /* OfflineOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7861A271CC1E82300A6AFBB /* OfflineOperation.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -25,9 +25,9 @@
 		A7861A141CC1C35400A6AFBB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A7861A171CC1C35400A6AFBB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		A7861A191CC1C35400A6AFBB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		A7861A211CC1C3D400A6AFBB /* MLOfflineManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MLOfflineManager.swift; path = ../Source/MLOfflineManager.swift; sourceTree = "<group>"; };
+		A7861A211CC1C3D400A6AFBB /* OfflineManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = OfflineManager.swift; path = ../Source/OfflineManager.swift; sourceTree = "<group>"; };
 		A7861A251CC1D58700A6AFBB /* Reachability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Reachability.swift; path = ../Dependencies/Reachability.swift/Reachability/Reachability.swift; sourceTree = "<group>"; };
-		A7861A271CC1E82300A6AFBB /* MLOfflineOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MLOfflineOperation.swift; path = ../Source/MLOfflineOperation.swift; sourceTree = "<group>"; };
+		A7861A271CC1E82300A6AFBB /* OfflineOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = OfflineOperation.swift; path = ../Source/OfflineOperation.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,15 +62,31 @@
 			children = (
 				A7861A0D1CC1C35400A6AFBB /* AppDelegate.swift */,
 				A7861A0F1CC1C35400A6AFBB /* ViewController.swift */,
-				A7861A211CC1C3D400A6AFBB /* MLOfflineManager.swift */,
-				A7861A271CC1E82300A6AFBB /* MLOfflineOperation.swift */,
-				A7861A251CC1D58700A6AFBB /* Reachability.swift */,
+				A7BFD91B1CC28A630072D0CA /* Source */,
+				A7BFD91C1CC28A680072D0CA /* Dependencies */,
 				A7861A111CC1C35400A6AFBB /* Main.storyboard */,
 				A7861A141CC1C35400A6AFBB /* Assets.xcassets */,
 				A7861A161CC1C35400A6AFBB /* LaunchScreen.storyboard */,
 				A7861A191CC1C35400A6AFBB /* Info.plist */,
 			);
 			path = OfflineManager;
+			sourceTree = "<group>";
+		};
+		A7BFD91B1CC28A630072D0CA /* Source */ = {
+			isa = PBXGroup;
+			children = (
+				A7861A211CC1C3D400A6AFBB /* OfflineManager.swift */,
+				A7861A271CC1E82300A6AFBB /* OfflineOperation.swift */,
+			);
+			name = Source;
+			sourceTree = "<group>";
+		};
+		A7BFD91C1CC28A680072D0CA /* Dependencies */ = {
+			isa = PBXGroup;
+			children = (
+				A7861A251CC1D58700A6AFBB /* Reachability.swift */,
+			);
+			name = Dependencies;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -144,8 +160,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A7861A281CC1E82300A6AFBB /* MLOfflineOperation.swift in Sources */,
-				A7861A221CC1C3D400A6AFBB /* MLOfflineManager.swift in Sources */,
+				A7861A281CC1E82300A6AFBB /* OfflineOperation.swift in Sources */,
+				A7861A221CC1C3D400A6AFBB /* OfflineManager.swift in Sources */,
 				A7861A101CC1C35400A6AFBB /* ViewController.swift in Sources */,
 				A7861A261CC1D58700A6AFBB /* Reachability.swift in Sources */,
 				A7861A0E1CC1C35400A6AFBB /* AppDelegate.swift in Sources */,

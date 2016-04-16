@@ -1,6 +1,6 @@
 //
-//  MLOfflineManager.swift
-//  MLOfflineManager
+//  OfflineManager.swift
+//  OfflineManager
 //
 //  Created by Maximilian Litteral on 4/15/16.
 //  Copyright © 2016 Maximilian Litteral. All rights reserved.
@@ -8,27 +8,33 @@
 
 import Foundation
 
-enum MLOperationResult {
+enum OperationResult {
     case Success
     case Retry(interval: NSTimeInterval)
     case Failed
 }
 
-class MLOfflineManager: NSObject {
+class OfflineManager: NSObject {
     
     // Type aliases
-    typealias SuccessCompletionClosure = ((result: MLOperationResult) -> Void)
+    typealias SuccessCompletionClosure = ((result: OperationResult) -> Void)
     
     // Static
-    static let defaultManager = MLOfflineManager()
-    static var handleOfflineOperation: ((operation: MLOfflineOperation, fromManager: MLOfflineManager, completion: SuccessCompletionClosure) -> Void)?
+    static let defaultManager = OfflineManager()
+    static var handleOfflineOperation: ((operation: OfflineOperation, fromManager: OfflineManager, completion: SuccessCompletionClosure) -> Void)?
     
     // Public
     private(set) var reachability: Reachability?
     private(set) var name: String
     
+    /// Maximum number of operations that can run at the same time. Default is set to 0, which means there is no limit.
+    var maxConcurrentOperations: Int = 0
+    /// Wait time between operations. This does not effect when new operations start if maxConcurrentOperations is 0, or if the maximimum has not been reached yet. Default is 0.
+    var waitTimeBetweenOperations: NSTimeInterval = 0
+    
     // Private
-    private var operations: [MLOfflineOperation] = []
+    private var operations: [OfflineOperation] = []
+    private var numberOfRunningOperations: Int = 0
     
     // MARK: - Lifecycle
     
@@ -86,15 +92,17 @@ class MLOfflineManager: NSObject {
     // MARK: Save and Load
     
     func saveOperations() {
-        let dictOperations = self.operations.map { $0.dictionaryRepresentation() }
         print("Saving \(self.operations.count) operations")
-        NSUserDefaults.standardUserDefaults().setObject(dictOperations, forKey: self.name)
+        
+        let archivedData = NSKeyedArchiver.archivedDataWithRootObject(self.operations)
+        NSUserDefaults.standardUserDefaults().setObject(archivedData, forKey: self.name)
         NSUserDefaults.standardUserDefaults().synchronize()
     }
     
     func loadOperations() {
-        if let dictOperations = NSUserDefaults.standardUserDefaults().objectForKey(self.name) as? [[String: AnyObject]] {
-            self.operations  = dictOperations.flatMap { MLOfflineOperation(dictionaryRepresentation: $0) }
+        if let data = NSUserDefaults.standardUserDefaults().objectForKey(self.name) as? NSData,
+            operations = NSKeyedUnarchiver.unarchiveObjectWithData(data) as? [OfflineOperation] {
+            self.operations = operations
             print("Loaded \(self.operations.count) operations")
         }
         else {
@@ -104,34 +112,45 @@ class MLOfflineManager: NSObject {
     
     // MARK: Add / Remove operations
     
-    func append(operation: MLOfflineOperation) {
+    func append(operation: OfflineOperation) {
         self.operations.append(operation)
-        self.tryOperation(operation)
+        
+        if self.maxConcurrentOperations == 0 ||
+            self.numberOfRunningOperations != self.maxConcurrentOperations {
+            self.tryOperation(operation)
+        }
     }
     
-    func tryOperation(operation: MLOfflineOperation) {
+    func tryOperation(operation: OfflineOperation) {
         guard reachability?.currentReachabilityStatus != .NotReachable else { return }
         
-        MLOfflineManager.handleOfflineOperation?(operation: operation, fromManager: self, completion: { [weak self] (response) in
+        self.numberOfRunningOperations += 1 // Increase number of running operations
+        operation.state == .Running
+        
+        OfflineManager.handleOfflineOperation?(operation: operation, fromManager: self, completion: { [weak self] (response) in
             guard let wSelf = self else { return }
-            
+            wSelf.numberOfRunningOperations -= 1 // Decerment number of running operations
+    
             switch response {
             case .Success:
                 print("Woohoo! Success")
                 wSelf.removeOperation(operation)
                 wSelf.checkForNextOperation()
             case .Retry(let interval):
+                operation.state == .Preparing
                 print("Will retry in \(interval) seconds")
                 wSelf.wait(seconds: interval, block: {
                     wSelf.tryOperation(operation)
                 })
             case .Failed:
+                operation.state == .Failed
                 print("Will retry at a later time")
+                wSelf.checkForNextOperation()
             }
         })
     }
     
-    func removeOperation(operation: MLOfflineOperation) {
+    func removeOperation(operation: OfflineOperation) {
         if let last = self.operations.last where last == operation {
             self.operations.removeLast()
         }
@@ -153,7 +172,27 @@ class MLOfflineManager: NSObject {
     }
     
     private func checkForNextOperation() {
-        guard let operation = self.operations.last else { return }
-        self.tryOperation(operation)
+        let operationsCount = self.operations.count
+        guard operationsCount > 0 else { return print("All finished!") }
+        
+        for i in (0..<operationsCount).reverse() {
+            guard self.maxConcurrentOperations == 0 ||
+                self.numberOfRunningOperations != self.maxConcurrentOperations else { return } // Maximum number of operation are running
+            let operation = self.operations[i]
+            
+            guard operation.state == .Ready else { continue } // Find operation that is not running
+            
+            if self.waitTimeBetweenOperations > 0 {
+                operation.state == .Preparing
+                self.wait(seconds: self.waitTimeBetweenOperations, block: { [weak self] in
+                    guard let wSelf = self else { return }
+                    wSelf.tryOperation(operation)
+                })
+                return // Wait before running
+            }
+            else {
+                self.tryOperation(operation)
+            }
+        }
     }
 }

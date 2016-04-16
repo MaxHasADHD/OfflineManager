@@ -12,13 +12,31 @@ import UIKit
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
+    lazy var session: NSURLSession = {
+        let configuration = NSURLSessionConfiguration.defaultSessionConfiguration()
+        let session = NSURLSession(configuration: configuration)
+        return session
+    }()
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         // Override point for customization after application launch.
         
         // Offline manager
-        MLOfflineManager.handleOfflineOperation = self.handleOfflineOperation
-        MLOfflineManager.defaultManager.startHandlingOperations()
+        OfflineManager.handleOfflineOperation = self.handleOfflineOperation
+        OfflineManager.defaultManager.startHandlingOperations()
+        
+        OfflineManager.defaultManager.maxConcurrentOperations = 1
+        OfflineManager.defaultManager.waitTimeBetweenOperations = 10
+        
+        // Add operations
+        let imageURLs = [
+            "http://www.contentamp.com/wp-content/uploads/2013/04/meme7.jpg",
+            "http://funny-pictures-blog.com/wp-content/uploads/funny-pictures/MEME---My-EX.jpg",
+            "http://memecrunch.com/meme/11HI4/thank-you/image.png"
+        ]
+        for imageURL in imageURLs {
+            OfflineManager.defaultManager.append(OfflineOperation(operationID: "ImageDownloadOperation", userInfo: ["URLString": imageURL], object: nil))
+        }
         
         return true
     }
@@ -31,7 +49,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationDidEnterBackground(application: UIApplication) {
         // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
         // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
-        MLOfflineManager.defaultManager.saveOperations()
+        OfflineManager.defaultManager.saveOperations()
     }
 
     func applicationWillEnterForeground(application: UIApplication) {
@@ -47,11 +65,30 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 }
 
-// MARK: - MLOfflineManager
+// MARK: - OfflineManager
 extension AppDelegate {
-    func handleOfflineOperation(operation: MLOfflineOperation, fromManager: MLOfflineManager, completion: ((result: MLOperationResult) -> Void)) {
+    func handleOfflineOperation(operation: OfflineOperation, fromManager: OfflineManager, completion: ((result: OperationResult) -> Void)) {
         
-        completion(result: MLOperationResult.Success)
+        guard let urlString = operation.userInfo?["URLString"] as? String,
+            URL = NSURL(string: urlString) else {
+                completion(result: OperationResult.Failed)
+                return
+        }
+        
+        self.session.downloadTaskWithURL(URL) { (url, response, error) in
+            guard error == nil else {
+                completion(result: .Failed)
+                return
+            }
+            
+            guard let HTTPResponse = response as? NSHTTPURLResponse
+                where HTTPResponse.statusCode == 200 else {
+                    completion(result: .Failed)
+                    return
+            }
+            
+            completion(result: .Success)
+        }.resume()
     }
 }
 

@@ -17,8 +17,8 @@ func application(application: UIApplication, didFinishLaunchingWithOptions launc
     ...
             
     // Offline manager
-    MLOfflineManager.handleOfflineOperation = self.handleOfflineOperation
-    MLOfflineManager.defaultManager.startHandlingOperations()
+    OfflineManager.handleOfflineOperation = self.handleOfflineOperation
+    OfflineManager.defaultManager.startHandlingOperations()
             
     return true
 }
@@ -29,12 +29,12 @@ func applicationDidEnterBackground(application: UIApplication) {
     
     ...
     
-    MLOfflineManager.defaultManager.saveOperations()
+    OfflineManager.defaultManager.saveOperations()
 }
 
-// MARK: - MLOfflineManager
+// MARK: - OfflineManager
 extension AppDelegate {
-    func handleOfflineOperation(operation: MLOfflineOperation, fromManager: MLOfflineManager, completion: ((response: MLOperationResponse) -> Void)) {
+    func handleOfflineOperation(operation: OfflineOperation, fromManager: OfflineManager, completion: ((response: OperationResponse) -> Void)) {
         // Handle operations here
     }
 }
@@ -43,8 +43,8 @@ extension AppDelegate {
 
 ###Add Operation
 ```
-let operation = MLOfflineOperation(operationID: "updateStatus", userInfo: ["status": "Hello, world!"], object: nil)
-MLOfflineManager.defaultManager.append(operation)
+let operation = OfflineOperation(operationID: "updateStatus", userInfo: ["status": "Hello, world!"], object: nil)
+OfflineManager.defaultManager.append(operation)
 ```
 
 ##TODO List
