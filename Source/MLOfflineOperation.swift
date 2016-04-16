@@ -23,7 +23,18 @@ struct MLOfflineOperation {
 extension MLOfflineOperation: Hashable {
     var hashValue: Int {
         get {
-            return self.operationID.hash * (object?.hash ?? 1) * (userInfo?.description.hash ?? 1)
+            if let info = userInfo,
+                obj = object {
+                return info.description.hashValue ^ self.operationID.hashValue ^ obj.hashValue
+            }
+            if let info = userInfo {
+                return info.description.hashValue ^ self.operationID.hashValue
+            }
+            else if let obj = object {
+                return obj.hashValue ^ self.operationID.hashValue
+            }
+            
+            return self.operationID.hashValue
         }
     }
 }

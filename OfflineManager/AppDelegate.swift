@@ -13,15 +13,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
-
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         // Override point for customization after application launch.
         
         // Offline manager
         MLOfflineManager.handleOfflineOperation = self.handleOfflineOperation
         MLOfflineManager.defaultManager.startHandlingOperations()
-//        OfflineManager.defaultManager.append(OfflineOperation(operationID: "TestOperation", userInfo: ["ID": 123456], object: nil))
-//        OfflineManager.defaultManager.append(OfflineOperation(operationID: "TestOperation", userInfo: ["ID": 15252], object: nil))
+        
         return true
     }
 
@@ -49,9 +47,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 }
 
+// MARK: - MLOfflineManager
 extension AppDelegate {
-    func handleOfflineOperation(operation: MLOfflineOperation, fromManager: MLOfflineManager, completionHandler: ((success: Bool) -> Void)) {
-//        completionHandler(success: true)
+    func handleOfflineOperation(operation: MLOfflineOperation, fromManager: MLOfflineManager, completion: ((result: MLOperationResult) -> Void)) {
+        
+        completion(result: MLOperationResult.Success)
     }
 }
 

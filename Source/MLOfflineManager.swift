@@ -8,10 +8,16 @@
 
 import Foundation
 
+enum MLOperationResult {
+    case Success
+    case Retry(interval: NSTimeInterval)
+    case Failed
+}
+
 class MLOfflineManager: NSObject {
     
     // Type aliases
-    typealias SuccessCompletionClosure = ((success: Bool) -> Void)
+    typealias SuccessCompletionClosure = ((result: MLOperationResult) -> Void)
     
     // Static
     static let defaultManager = MLOfflineManager()
@@ -74,14 +80,7 @@ class MLOfflineManager: NSObject {
     // MARK: - Actions
     
     func startHandlingOperations() {
-        if reachability?.currentReachabilityStatus != .NotReachable {
-            // Perform last operation
-            guard let operation = self.operations.last else { return }
-            MLOfflineManager.handleOfflineOperation?(operation: operation, fromManager: self, completion: { (success) in
-                print("Woohoo! Operation complete. Now removing it")
-                self.removeOperation(operation)
-            })
-        }
+        self.checkForNextOperation()
     }
     
     // MARK: Save and Load
@@ -107,14 +106,29 @@ class MLOfflineManager: NSObject {
     
     func append(operation: MLOfflineOperation) {
         self.operations.append(operation)
+        self.tryOperation(operation)
+    }
+    
+    func tryOperation(operation: MLOfflineOperation) {
+        guard reachability?.currentReachabilityStatus != .NotReachable else { return }
         
-        if reachability?.currentReachabilityStatus != .NotReachable {
-            print("connected")
-            MLOfflineManager.handleOfflineOperation?(operation: operation, fromManager: self, completion: { (success) in
-                print("Woohoo! Operation complete. Now removing it")
-                self.removeOperation(operation)
-            })
-        }
+        MLOfflineManager.handleOfflineOperation?(operation: operation, fromManager: self, completion: { [weak self] (response) in
+            guard let wSelf = self else { return }
+            
+            switch response {
+            case .Success:
+                print("Woohoo! Success")
+                wSelf.removeOperation(operation)
+                wSelf.checkForNextOperation()
+            case .Retry(let interval):
+                print("Will retry in \(interval) seconds")
+                wSelf.wait(seconds: interval, block: {
+                    wSelf.tryOperation(operation)
+                })
+            case .Failed:
+                print("Will retry at a later time")
+            }
+        })
     }
     
     func removeOperation(operation: MLOfflineOperation) {
@@ -125,5 +139,21 @@ class MLOfflineManager: NSObject {
             guard let index = self.operations.indexOf(operation) else { return }
             self.operations.removeAtIndex(index)
         }
+    }
+    
+    // MARK: - Private
+    
+    private func wait(seconds seconds: Double, block: (() -> Void)) {
+        let delay = seconds * Double(NSEC_PER_SEC)
+        let time = dispatch_time(DISPATCH_TIME_NOW, Int64(delay))
+        
+        dispatch_after(time, dispatch_get_main_queue(), { () -> Void in
+            block()
+        })
+    }
+    
+    private func checkForNextOperation() {
+        guard let operation = self.operations.last else { return }
+        self.tryOperation(operation)
     }
 }

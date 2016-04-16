@@ -2,10 +2,46 @@
 
 MLOfflineManager helps restore and retry common network operations once internet is reachable. If a network operation fails, MLOperationManager will retry when app launches or when internet is available.
 
+##Installation
+###Manual
+Just drop the contents of the **Source** folder into your project. That's it!
+
+##Instructions
+
+###Setup
+**AppDelegate.swift**
+```
+func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
+    // Override point for customization after application launch.
+    
+    ...
+            
+    // Offline manager
+    MLOfflineManager.handleOfflineOperation = self.handleOfflineOperation
+    MLOfflineManager.defaultManager.startHandlingOperations()
+            
+    return true
+}
+
+// MARK: - MLOfflineManager
+extension AppDelegate {
+    func handleOfflineOperation(operation: MLOfflineOperation, fromManager: MLOfflineManager, completion: ((response: MLOperationResponse) -> Void)) {
+        // Handle operations here
+    }
+}
+
+```
+
+###Add Operation
+```
+let operation = MLOfflineOperation(operationID: "updateStatus", userInfo: ["status": "Hello, world!"], object: nil)
+MLOfflineManager.defaultManager.append(operation)
+```
+
 ##TODO List
 - [x] Run operation if network is reachable
+- [x] Retry operations
 - [ ] Run operations on specified network (WiFi/LTE)
-- [ ] Remove unsuccessful operations for specified error codes
 
 ##License
 The MIT License (MIT)
