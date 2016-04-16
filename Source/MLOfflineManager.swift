@@ -1,6 +1,6 @@
 //
-//  OfflineManager.swift
-//  OfflineManager
+//  MLOfflineManager.swift
+//  MLOfflineManager
 //
 //  Created by Maximilian Litteral on 4/15/16.
 //  Copyright © 2016 Maximilian Litteral. All rights reserved.
@@ -8,21 +8,21 @@
 
 import Foundation
 
-class OfflineManager: NSObject {
+class MLOfflineManager: NSObject {
     
     // Type aliases
     typealias SuccessCompletionClosure = ((success: Bool) -> Void)
     
     // Static
-    static let defaultManager = OfflineManager()
-    static var handleOfflineOperation: ((operation: OfflineOperation, fromManager: OfflineManager, completion: SuccessCompletionClosure) -> Void)?
+    static let defaultManager = MLOfflineManager()
+    static var handleOfflineOperation: ((operation: MLOfflineOperation, fromManager: MLOfflineManager, completion: SuccessCompletionClosure) -> Void)?
     
     // Public
     private(set) var reachability: Reachability?
     private(set) var name: String
     
     // Private
-    private var operations: [OfflineOperation] = []
+    private var operations: [MLOfflineOperation] = []
     
     // MARK: - Lifecycle
     
@@ -77,7 +77,7 @@ class OfflineManager: NSObject {
         if reachability?.currentReachabilityStatus != .NotReachable {
             // Perform last operation
             guard let operation = self.operations.last else { return }
-            OfflineManager.handleOfflineOperation?(operation: operation, fromManager: self, completion: { (success) in
+            MLOfflineManager.handleOfflineOperation?(operation: operation, fromManager: self, completion: { (success) in
                 print("Woohoo! Operation complete. Now removing it")
                 self.removeOperation(operation)
             })
@@ -95,7 +95,7 @@ class OfflineManager: NSObject {
     
     func loadOperations() {
         if let dictOperations = NSUserDefaults.standardUserDefaults().objectForKey(self.name) as? [[String: AnyObject]] {
-            self.operations  = dictOperations.flatMap { OfflineOperation(dictionaryRepresentation: $0) }
+            self.operations  = dictOperations.flatMap { MLOfflineOperation(dictionaryRepresentation: $0) }
             print("Loaded \(self.operations.count) operations")
         }
         else {
@@ -105,19 +105,19 @@ class OfflineManager: NSObject {
     
     // MARK: Add / Remove operations
     
-    func append(operation: OfflineOperation) {
+    func append(operation: MLOfflineOperation) {
         self.operations.append(operation)
         
         if reachability?.currentReachabilityStatus != .NotReachable {
             print("connected")
-            OfflineManager.handleOfflineOperation?(operation: operation, fromManager: self, completion: { (success) in
+            MLOfflineManager.handleOfflineOperation?(operation: operation, fromManager: self, completion: { (success) in
                 print("Woohoo! Operation complete. Now removing it")
                 self.removeOperation(operation)
             })
         }
     }
     
-    func removeOperation(operation: OfflineOperation) {
+    func removeOperation(operation: MLOfflineOperation) {
         if let last = self.operations.last where last == operation {
             self.operations.removeLast()
         }

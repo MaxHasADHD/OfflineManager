@@ -1,6 +1,6 @@
 //
-//  OfflineOperation.swift
-//  OfflineManager
+//  MLOfflineOperation.swift
+//  MLOfflineManager
 //
 //  Created by Maximilian Litteral on 4/15/16.
 //  Copyright © 2016 Maximilian Litteral. All rights reserved.
@@ -13,14 +13,14 @@ protocol Dictionariable {
     init?(dictionaryRepresentation: [String: AnyObject]?)
 }
 
-struct OfflineOperation {
+struct MLOfflineOperation {
     let operationID: String
     let userInfo: [String: AnyObject]?
     let object: AnyObject?
 }
 
 // MARK: - Hashable & Equatable
-extension OfflineOperation: Hashable {
+extension MLOfflineOperation: Hashable {
     var hashValue: Int {
         get {
             return self.operationID.hash * (object?.hash ?? 1) * (userInfo?.description.hash ?? 1)
@@ -28,12 +28,12 @@ extension OfflineOperation: Hashable {
     }
 }
 
-func ==(lhs: OfflineOperation, rhs: OfflineOperation) -> Bool {
+func ==(lhs: MLOfflineOperation, rhs: MLOfflineOperation) -> Bool {
     return lhs.hashValue == rhs.hashValue
 }
 
 // MARK: - Dictionariable
-extension OfflineOperation: Dictionariable {
+extension MLOfflineOperation: Dictionariable {
     func dictionaryRepresentation() -> [String: AnyObject] {
         
         var representation: [String: AnyObject] = [

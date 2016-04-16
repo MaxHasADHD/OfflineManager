@@ -18,8 +18,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Override point for customization after application launch.
         
         // Offline manager
-        OfflineManager.handleOfflineOperation = self.handleOfflineOperation
-        OfflineManager.defaultManager.startHandlingOperations()
+        MLOfflineManager.handleOfflineOperation = self.handleOfflineOperation
+        MLOfflineManager.defaultManager.startHandlingOperations()
 //        OfflineManager.defaultManager.append(OfflineOperation(operationID: "TestOperation", userInfo: ["ID": 123456], object: nil))
 //        OfflineManager.defaultManager.append(OfflineOperation(operationID: "TestOperation", userInfo: ["ID": 15252], object: nil))
         return true
@@ -33,7 +33,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationDidEnterBackground(application: UIApplication) {
         // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
         // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
-        OfflineManager.defaultManager.saveOperations()
+        MLOfflineManager.defaultManager.saveOperations()
     }
 
     func applicationWillEnterForeground(application: UIApplication) {
@@ -50,7 +50,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 }
 
 extension AppDelegate {
-    func handleOfflineOperation(operation: OfflineOperation, fromManager: OfflineManager, completionHandler: ((success: Bool) -> Void)) {
+    func handleOfflineOperation(operation: MLOfflineOperation, fromManager: MLOfflineManager, completionHandler: ((success: Bool) -> Void)) {
 //        completionHandler(success: true)
     }
 }
