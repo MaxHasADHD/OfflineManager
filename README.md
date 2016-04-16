@@ -1,13 +1,13 @@
-*MLOfflineManager*
+#MLOfflineManager
 
 MLOfflineManager helps restore and retry common network operations once internet is reachable. If a network operation fails, MLOperationManager will retry when app launches or when internet is available.
 
-**TODO List**
+##TODO List
 - [x] Run operation if network is reachable
 - [ ] Run operations on specified network (WiFi/LTE)
 - [ ] Remove unsuccessful operations for specified error codes
 
-**License**
+##License
 The MIT License (MIT)
 
 Copyright (c) 2016 Maximilian Litteral
