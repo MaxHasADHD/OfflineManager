@@ -23,6 +23,15 @@ func application(application: UIApplication, didFinishLaunchingWithOptions launc
     return true
 }
 
+func applicationDidEnterBackground(application: UIApplication) {
+    // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
+    // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+    
+    ...
+    
+    MLOfflineManager.defaultManager.saveOperations()
+}
+
 // MARK: - MLOfflineManager
 extension AppDelegate {
     func handleOfflineOperation(operation: MLOfflineOperation, fromManager: MLOfflineManager, completion: ((response: MLOperationResponse) -> Void)) {
