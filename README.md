@@ -1,6 +1,6 @@
-#MLOfflineManager
+#OfflineManager
 
-MLOfflineManager helps restore and retry common network operations once internet is reachable. If a network operation fails, MLOperationManager will retry when app launches or when internet is available.
+OfflineManager helps restore and retry common network operations once internet is reachable. If a network operation fails, OperationManager will retry when app launches or when internet is available.
 
 ##Installation
 ###Manual
