@@ -34,7 +34,7 @@ func applicationDidEnterBackground(application: UIApplication) {
 
 // MARK: - OfflineManager
 extension AppDelegate {
-    func handleOfflineOperation(operation: OfflineOperation, fromManager: OfflineManager, completion: ((response: OperationResponse) -> Void)) {
+    func handleOfflineOperation(operation: OfflineOperation, fromManager: OfflineManager, completion: ((response: OperationResult) -> Void)) {
         // Handle operations here
     }
 }
